@@ -7,15 +7,31 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            text-align: center;
         }
         .section {
             margin-bottom: 40px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .controls input, .controls select, .controls button {
+            padding: 10px;
+            font-size: 16px;
         }
         .gallery {
             display: grid;
             gap: 10px;
             width: 100%;
-            max-width: 600px; /* 可以根据需要调整 */
+            max-width: 600px;
             margin: 0 auto;
         }
         .gallery img {
@@ -23,98 +39,110 @@
             height: 100%;
             object-fit: cover;
             border: 1px solid #ccc;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .gallery img:hover {
+            transform: scale(1.05);
         }
         .hidden {
             display: none;
         }
-        /* 2x2 布局 */
         .gallery-2x2 {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        aspect-ratio: 1 / 1;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            aspect-ratio: 1 / 1;
         }
         .gallery-3x3 {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             aspect-ratio: 1 / 1;
         }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .gallery {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
+    <h1>四宫格/九宫格</h1>
 
-<h1>四宫格/九宫格</h1>
-
-<div class="section">
-    <h2>照片切分</h2>
-    <input type="file" id="photoInput" accept="image/*"><br>
-    <label>选择切分方式:</label>
-    <select id="splitOption">
-        <option value="4">四宫格</option>
-        <option value="9" selected>九宫格</option>
-    </select><br>
-    <button onclick="splitPhoto()">确认</button>
-    <div id="photoGrid" class="gallery hidden">
+    <div class="section">
+        <h2>照片切分</h2>
+        <div class="controls">
+            <input type="file" id="photoInput" accept="image/*">
+            <label for="splitOption">选择切分方式:</label>
+            <select id="splitOption">
+                <option value="4">四宫格</option>
+                <option value="9" selected>九宫格</option>
+            </select>
+            <button onclick="splitPhoto()">确认</button>
+        </div>
+        <div id="photoGrid" class="gallery hidden">
+        </div>
     </div>
-</div>
 
-<script>
+    <script>
+        // 照片切分函数（保持不变）
+        function splitPhoto() {
+            const input = document.getElementById('photoInput');
+            const splitOption = document.getElementById('splitOption').value;
+            const gridContainer = document.getElementById('photoGrid');
+            gridContainer.innerHTML = '';  // Clear previous grid
+            gridContainer.classList.add('hidden');
 
-    // 照片切分
-    function splitPhoto() {
-        const input = document.getElementById('photoInput');
-        const splitOption = document.getElementById('splitOption').value;
-        const gridContainer = document.getElementById('photoGrid');
-        gridContainer.innerHTML = '';  // Clear previous grid
-        gridContainer.classList.add('hidden');
-
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const gridSize = splitOption === '4' ? 2 : 3;
-                    if (splitOption === '4') {
-                        gridContainer.classList.remove('gallery-2x2');
-                        gridContainer.classList.remove('gallery-3x3');
-                        gridContainer.classList.add('gallery-2x2');
-                    } else {
-                        gridContainer.classList.remove('gallery-2x2');
-                        gridContainer.classList.remove('gallery-3x3');
-                        gridContainer.classList.add('gallery-3x3');
-                    }
-                    const cellWidth = img.width / gridSize;
-                    const cellHeight = img.height / gridSize;
-
-                    for (let y = 0; y < gridSize; y++) {
-                        for (let x = 0; x < gridSize; x++) {
-                            canvas.width = cellWidth;
-                            canvas.height = cellHeight;
-                            ctx.drawImage(img, x * cellWidth, y * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
-                            const dataUrl = canvas.toDataURL();
-                            const gridItem = document.createElement('div');
-                            // gridItem.classList.add('grid-item');
-                            gridItem.innerHTML = `<img src="${dataUrl}" width="100%" onclick="downloadImage('${dataUrl}')">`;
-                            gridContainer.appendChild(gridItem);
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const gridSize = splitOption === '4' ? 2 : 3;
+                        if (splitOption === '4') {
+                            gridContainer.classList.remove('gallery-2x2');
+                            gridContainer.classList.remove('gallery-3x3');
+                            gridContainer.classList.add('gallery-2x2');
+                        } else {
+                            gridContainer.classList.remove('gallery-2x2');
+                            gridContainer.classList.remove('gallery-3x3');
+                            gridContainer.classList.add('gallery-3x3');
                         }
-                    }
-                    gridContainer.classList.remove('hidden');
+                        const cellWidth = img.width / gridSize;
+                        const cellHeight = img.height / gridSize;
+
+                        for (let y = 0; y < gridSize; y++) {
+                            for (let x = 0; x < gridSize; x++) {
+                                canvas.width = cellWidth;
+                                canvas.height = cellHeight;
+                                ctx.drawImage(img, x * cellWidth, y * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+                                const dataUrl = canvas.toDataURL();
+                                const gridItem = document.createElement('div');
+                                // gridItem.classList.add('grid-item');
+                                gridItem.innerHTML = `<img src="${dataUrl}" width="100%" onclick="downloadImage('${dataUrl}')">`;
+                                gridContainer.appendChild(gridItem);
+                            }
+                        }
+                        gridContainer.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            }
         }
-    }
 
-    function downloadImage(dataUrl) {
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = '切分图片.png';
-        link.click();
-    }
-</script>
-
+        function downloadImage(dataUrl) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = '切分图片.png';
+            link.click();
+        }
+    </script>
 </body>
 </html>
