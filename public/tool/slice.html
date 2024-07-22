@@ -77,8 +77,12 @@
                     const ctx = canvas.getContext('2d');
                     const gridSize = splitOption === '4' ? 2 : 3;
                     if (splitOption === '4') {
+                        gridContainer.classList.remove('gallery-2x2');
+                        gridContainer.classList.remove('gallery-3x3');
                         gridContainer.classList.add('gallery-2x2');
                     } else {
+                        gridContainer.classList.remove('gallery-2x2');
+                        gridContainer.classList.remove('gallery-3x3');
                         gridContainer.classList.add('gallery-3x3');
                     }
                     const cellWidth = img.width / gridSize;
