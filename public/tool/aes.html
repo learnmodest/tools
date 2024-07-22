@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加解密小工具</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea, input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AES加解密小工具</h1>
+        <label for="message">消息:</label>
+        <textarea id="message" rows="4" placeholder="请输入要加密或解密的消息"></textarea>
+        
+        <label for="secretKey">密钥:</label>
+        <input type="password" id="secretKey" placeholder="请输入密钥">
+        
+        <div class="button-group">
+            <button onclick="doEncrypt()">加密</button>
+            <button onclick="doDecrypt()">解密</button>
+        </div>
+        
+        <label for="result">结果:</label>
+        <textarea id="result" rows="4" readonly></textarea>
+    </div>
+
+    <script>
+        const DefaultSecretKey = "ABCCBA123SAME123";
+        
+        function encryptMessage(message, secretKey) {
+            return CryptoJS.AES.encrypt(message, secretKey).toString();
+        }
+
+        function decryptMessage(encryptedMessage, secretKey) {
+            var bytes  = CryptoJS.AES.decrypt(encryptedMessage, secretKey);
+            var originalText = bytes.toString(CryptoJS.enc.Utf8);
+            return originalText;
+        }
+
+        function doEncrypt() {
+            var message = document.getElementById('message').value;
+            var secretKey = document.getElementById('secretKey').value || DefaultSecretKey;
+            var encryptedMessage = encryptMessage(message, secretKey);
+            document.getElementById('result').value = encryptedMessage;
+        }
+
+        function doDecrypt() {
+            var encryptedMessage = document.getElementById('message').value;
+            var secretKey = document.getElementById('secretKey').value || DefaultSecretKey;
+            var decryptedMessage = decryptMessage(encryptedMessage, secretKey);
+            document.getElementById('result').value = decryptedMessage;
+        }
+    </script>
+</body>
+</html>
