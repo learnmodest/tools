@@ -1,0 +1,11 @@
+.history
+out
+node_modules
+*.vsix
+dist
+.vscode/ipch
+.vscode-test
+wx-*.js.json
+.DS_Store
+package-lock.json
+.idea

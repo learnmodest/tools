@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>便携工具箱</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .gallery {
+            display: grid;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px; /* 可以根据需要调整 */
+            margin: 0 auto;
+        }
+        .gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+        .hidden {
+            display: none;
+        }
+        /* 2x2 布局 */
+        .gallery-2x2 {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        aspect-ratio: 1 / 1;
+        }
+        .gallery-3x3 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            aspect-ratio: 1 / 1;
+        }
+    </style>
+</head>
+<body>
+
+<h1>便携工具箱</h1>
+
+<div class="section">
+    <h2>Base64转换</h2>
+    <textarea id="base64Input" placeholder="输入:"></textarea>
+    <button onclick="encodeBase64()">编码</button>
+    <button onclick="decodeBase64()">解码</button>
+    <textarea id="base64Output" placeholder="结果:"></textarea>
+</div>
+
+<div class="section">
+    <h2>日期计算</h2>
+    <label>开始日期:</label>
+    <input type="date" id="startDate"><br>
+    <label>结束日期:</label>
+    <input type="date" id="endDate"><br>
+    <button onclick="calculateDateDifference()">计算日期差</button>
+    <p id="dateDifferenceResult"></p>
+    <label>基准日期:</label>
+    <input type="date" id="baseDate"><br>
+    <label>天数（正数向后，负数向前）:</label>
+    <input type="number" id="days"><br>
+    <button onclick="calculateNewDate()">日期推算</button>
+    <p id="newDateResult"></p>
+</div>
+
+<div class="section">
+    <h2>字数统计</h2>
+    <textarea id="textInput" placeholder="输入文本:"></textarea><br>
+    <label>输入指定字符（如：空格）:</label>
+    <input type="text" id="specifiedChar"><br>
+    <button onclick="countWords()">统计字数</button>
+    <button onclick="countWordsExcludingChar()">统计字数（不含指定字符）</button>
+    <p id="wordCountResult"></p>
+</div>
+
+<div class="section">
+    <h2>生肖查询</h2>
+    <label>输入年份或年龄:</label>
+    <input type="number" id="yearOrAge"><br>
+    <label>查询类型:</label>
+    <select id="queryType">
+        <option value="age">年龄查生肖</option>
+        <option value="year">出生年份查生肖</option>
+    </select><br>
+    <button onclick="queryZodiac()">查询</button>
+    <p id="zodiacResult"></p>
+</div>
+
+<div class="section">
+    <h2>照片切分</h2>
+    <input type="file" id="photoInput" accept="image/*"><br>
+    <label>选择切分方式:</label>
+    <select id="splitOption">
+        <option value="4">四宫格</option>
+        <option value="9" selected>九宫格</option>
+    </select><br>
+    <button onclick="splitPhoto()">确认</button>
+    <div id="photoGrid" class="gallery hidden">
+    </div>
+</div>
+
+<script>
+    // Base64 转换
+    function encodeBase64() {
+        const input = document.getElementById('base64Input').value;
+        const encoded = btoa(input);
+        document.getElementById('base64Output').value = encoded;
+    }
+
+    function decodeBase64() {
+        const input = document.getElementById('base64Input').value;
+        try {
+            const decoded = atob(input);
+            document.getElementById('base64Output').value = decoded;
+        } catch (e) {
+            alert('无效的 Base64 字符串');
+        }
+    }
+
+    // 日期计算
+    function calculateDateDifference() {
+        const start = new Date(document.getElementById('startDate').value);
+        const end = new Date(document.getElementById('endDate').value);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        document.getElementById('dateDifferenceResult').innerText = `日期差: ${diffDays} 天`;
+    }
+
+    function calculateNewDate() {
+        const baseDate = new Date(document.getElementById('baseDate').value);
+        const days = parseInt(document.getElementById('days').value, 10);
+        baseDate.setDate(baseDate.getDate() + days);
+        document.getElementById('newDateResult').innerText = `新日期: ${baseDate.toISOString().split('T')[0]}`;
+    }
+
+    // 字数统计
+    function countWords() {
+        const text = document.getElementById('textInput').value;
+        const wordCount = text.trim().split(/\s+/).length;
+        document.getElementById('wordCountResult').innerText = `字数: ${wordCount}`;
+    }
+
+    function countWordsExcludingChar() {
+        const text = document.getElementById('textInput').value;
+        const char = document.getElementById('specifiedChar').value;
+        const wordCount = text.split(new RegExp(`[^${char}]+`)).length - 1;
+        document.getElementById('wordCountResult').innerText = `字数（不含指定字符）: ${wordCount}`;
+    }
+
+    // 生肖查询
+    function queryZodiac() {
+        const yearOrAge = parseInt(document.getElementById('yearOrAge').value, 10);
+        const queryType = document.getElementById('queryType').value;
+        const currentYear = new Date().getFullYear();
+        let year;
+        if (queryType === 'age') {
+            year = currentYear - yearOrAge;
+        } else {
+            year = yearOrAge;
+        }
+        const zodiacs = ['猴', '鸡', '狗', '猪', '鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊'];
+        const zodiac = zodiacs[year % 12];
+        document.getElementById('zodiacResult').innerText = `生肖: ${zodiac}`;
+    }
+
+    // 照片切分
+    function splitPhoto() {
+        const input = document.getElementById('photoInput');
+        const splitOption = document.getElementById('splitOption').value;
+        const gridContainer = document.getElementById('photoGrid');
+        gridContainer.innerHTML = '';  // Clear previous grid
+        gridContainer.classList.add('hidden');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const gridSize = splitOption === '4' ? 2 : 3;
+                    if (splitOption === '4') {
+                        gridContainer.classList.add('gallery-2x2');
+                    } else {
+                        gridContainer.classList.add('gallery-3x3');
+                    }
+                    const cellWidth = img.width / gridSize;
+                    const cellHeight = img.height / gridSize;
+
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let x = 0; x < gridSize; x++) {
+                            canvas.width = cellWidth;
+                            canvas.height = cellHeight;
+                            ctx.drawImage(img, x * cellWidth, y * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+                            const dataUrl = canvas.toDataURL();
+                            const gridItem = document.createElement('div');
+                            // gridItem.classList.add('grid-item');
+                            gridItem.innerHTML = `<img src="${dataUrl}" width="100%" onclick="downloadImage('${dataUrl}')">`;
+                            gridContainer.appendChild(gridItem);
+                        }
+                    }
+                    gridContainer.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function downloadImage(dataUrl) {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = '切分图片.png';
+        link.click();
+    }
+</script>
+
+</body>
+</html>
